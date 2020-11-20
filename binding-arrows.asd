@@ -4,7 +4,7 @@
   :license "MIT"
   :description "An implementation of binding threading macros"
   :pathname "src"
-  :components ((:file "arrows")
+  :components ((:file "binding-arrows")
                (:file "documentation"))
   :in-order-to ((asdf:test-op (asdf:test-op #:binding-arrows/test))))
 

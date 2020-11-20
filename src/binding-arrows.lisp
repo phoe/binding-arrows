@@ -38,7 +38,8 @@
   `(let* ,(mapcar #'list symbols value-forms)
      ,(car (last symbols))))
 
-(defun expand-arrow (forms &key symbol-fn value-fn)
+(defun expand-arrow (forms &key symbol-fn value-fn return-fn)
+  (declare (ignore return-fn))
   (case (length forms)
     (0 'nil)
     (1 (first forms))
@@ -56,11 +57,22 @@
             store-fn
             access-fn)))
 
-(defun expand-arrow-setf (forms env &key symbol-fn value-fn)
+(defun expand-arrow-setf-if-return (symbols value-forms env)
+  (multiple-value-bind (vars vals stores store-fn access-fn)
+      (get-setf-expansion (third (car (last value-forms))) env)
+    (values (append (butlast symbols) vars)
+            (append (butlast value-forms) vals)
+            stores
+            `(multiple-value-prog1 (values ,@stores)
+               (when ,(car (last (butlast symbols))) ,store-fn))
+            access-fn)))
+
+(defun expand-arrow-setf (forms env &key symbol-fn value-fn
+                                      (return-fn #'expand-arrow-setf-return))
   (case (length forms)
     (0 (error "Cannot get the SETF expansion of an empty threading macro."))
     (1 (get-setf-expansion (first forms)))
-    (t (expand-aux forms symbol-fn value-fn #'expand-arrow-setf-return env))))
+    (t (expand-aux forms symbol-fn value-fn return-fn env))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Macrology
@@ -95,7 +107,7 @@
   form)
 
 (defun some-value (value-fn symbol form)
-  `(and ,symbol ,(funcall value-fn symbol form)))
+  `(if ,symbol ,(funcall value-fn symbol form) nil))
 
 (defun some-value-first (symbol form)
   (some-value #'value-first symbol form))
@@ -156,28 +168,36 @@
   (expand forms :value-fn #'diamond-value-last))
 
 (define-arrow some-> (&rest forms)
-  (expand forms :value-fn #'some-value-first))
+  (expand forms :value-fn #'some-value-first
+                :return-fn #'expand-arrow-setf-if-return))
 
 (define-arrow some->> (&rest forms)
-  (expand forms :value-fn #'some-value-last))
+  (expand forms :value-fn #'some-value-last
+                :return-fn #'expand-arrow-setf-if-return))
 
 (define-arrow some-<> (&rest forms)
-  (expand forms :value-fn #'some-diamond-value-first))
+  (expand forms :value-fn #'some-diamond-value-first
+                :return-fn #'expand-arrow-setf-if-return))
 
 (define-arrow some-<>> (&rest forms)
-  (expand forms :value-fn #'some-diamond-value-last))
+  (expand forms :value-fn #'some-diamond-value-last
+                :return-fn #'expand-arrow-setf-if-return))
 
 (define-arrow cond-> (&rest forms)
-  (expand forms :value-fn #'cond-value-first))
+  (expand forms :value-fn #'cond-value-first
+                :return-fn #'expand-arrow-setf-if-return))
 
 (define-arrow cond->> (&rest forms)
-  (expand forms :value-fn #'cond-value-last))
+  (expand forms :value-fn #'cond-value-last
+                :return-fn #'expand-arrow-setf-if-return))
 
 (define-arrow cond-<> (&rest forms)
-  (expand forms :value-fn #'cond-diamond-value-first))
+  (expand forms :value-fn #'cond-diamond-value-first
+                :return-fn #'expand-arrow-setf-if-return))
 
 (define-arrow cond-<>> (&rest forms)
-  (expand forms :value-fn #'cond-diamond-value-last))
+  (expand forms :value-fn #'cond-diamond-value-last
+                :return-fn #'expand-arrow-setf-if-return))
 
 (define-arrow ->* (&rest forms)
   (let ((forms (append (last forms) (butlast forms))))

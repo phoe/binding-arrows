@@ -139,13 +139,13 @@ Is equivalent to:
 
 ```lisp
 (let ((temp1 foo)
-      (temp2 (and temp1 (bar temp1)))
-      (temp3 (and temp2 (baz temp2)))
-      (temp4 (and temp3 (quux temp3 1 2 3))))
+      (temp2 (if temp1 (bar temp1) nil))
+      (temp3 (if temp2 (baz temp2) nil))
+      (temp4 (if temp3 (quux temp3 1 2 3) nil)))
   temp4)
 ```
 
-We can see that the `and` calls ensure that the previously bound value is non-`nil` before the next one is computed; otherwise, the currently bound variable becomes null, and all subsequent `and` calls return `nil` as well.
+We can see that the `if` calls ensure that the previously bound value is non-`nil` before the next one is computed; otherwise, the currently bound variable becomes null, and all subsequent `if` calls return `nil` as well.
 
 ## Conditional threading macros
 
