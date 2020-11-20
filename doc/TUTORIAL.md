@@ -349,3 +349,30 @@ And therefore to:
 ```
 
 As useful as named threading macros are, they may contribute negatively to code readability. If that becomes the case, it might be better to use explicit `let` bindings.
+
+## Threading macros as places
+
+It is possible to use a threading macro as a place in a `setf` call. This trait is specific to Common Lisp (since Clojure does not have mutable places) and permits for concise syntax for nesting accessors.
+
+For example:
+
+```lisp
+(setf (-> 0 (nthcdr list) cdr cdr car) 42)
+```
+
+The above is equivalent to the following:
+
+```lisp
+(let* ((temp1 0)
+       (temp2 (nthcdr temp1 list))
+       (temp3 (cdr temp2))
+       (temp4 (cdr temp3))
+       (new-value 42))
+  (rplaca temp4 new-value))
+```
+
+And therefore to the following:
+
+```lisp
+(rplaca (cdr (cdr (nthcdr 0 list))) 42)
+```

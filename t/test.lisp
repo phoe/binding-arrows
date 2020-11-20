@@ -341,7 +341,7 @@
 (deftest setf--> ()
   (let ((list (list 1 2 3 4 5)))
     (setf (-> 0 (nthcdr list) cdr cdr car) 42)
-    (is (equal list  '(1 2 42 4 5)))))
+    (is (equal list '(1 2 42 4 5)))))
 
 (deftest setf-->> ()
   (let ((list (list 1 2 3 4 5)))
@@ -351,12 +351,12 @@
 (deftest setf--<> ()
   (let ((list (list 1 2 3 4 5)))
     (setf (-<> 0 (nthcdr <> list) cdr cdr car) 42)
-    (is (equal list  '(1 2 42 4 5)))))
+    (is (equal list '(1 2 42 4 5)))))
 
 (deftest setf--<>> ()
   (let ((list (list 1 2 3 4 5)))
     (setf (-<>> 0 (nthcdr <> list) cdr cdr car) 42)
-    (is (equal list  '(1 2 42 4 5)))))
+    (is (equal list '(1 2 42 4 5)))))
 
 (deftest setf-some-> ()
   (let ((list (list 1 2 3 4 5)))
