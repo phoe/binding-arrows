@@ -1,14 +1,29 @@
-# Arrows
+# Binding Arrows
 
-An implementation of Clojure-inspired threading macros.
+An implementation of threading macros based on binding anonymous variables.
 
 ## Overview
 
-This is an ASDF system providing the package `arrows`. Its home is at
-https://gitlab.com/Harleqin/arrows, with a mirror at
-https://github.com/Harleqin/arrows.
+This system implements binding threading macros - a kind of threading macros with different semantics than classical, [Clojure core threading macros](https://clojure.org/guides/threading_macros) or their extension, [swiss-arrows](https://github.com/rplevy/swiss-arrows). Two Common Lisp implementations of those are [`arrows`](https://github.com/Harleqin/arrows) and [`arrow-macros`](https://github.com/hipeta/arrow-macros).
 
-This system contains:
+This system is a fork of [`arrows`](https://github.com/Harleqin/arrows) with changes in semantics that make it impossible to merge back upstream.
+
+## What's the difference?
+
+A binding threading macro implicitly binds a variable on each computation step, as opposed to working purely on the syntactic level like the classical threading macros.
+
+This has two main implications:
+
+* Binding threading macros expand into a `let*` form.
+  * Binding threading macros are nicer to read when macroexpanded.
+  * Binding threading macros preserve for the debugger.
+  * `setf` expansions are handled differently, but gracefully.
+* Binding threading macros implicitly assume that each computation step is evaluated.
+  * This means that e.g. `(->> (loop) (or t))` is going to return `t` on a traditional (Clojure-like) implementation of threading macros, but **will hang** on a binding implementation.
+
+## Contents
+
+This system contains a package `binding-macros` that exports the following symbols:
 
 * threading macros `->` and `->>`,
 * diamond threading macros `-<>` and `-<>>`,
@@ -20,12 +35,21 @@ This system contains:
 * named threading macro `as->`,
 * inverted named threading macro `as->*`.
 
+All of the aforementioned threading macros name valid places for use in `setf`.
+
+## Loading
+
+`(ql:quickload :binding-arrows)`
+
+## Testing
+
+`(asdf:test-system :binding-arrows)`
+
 ## Manual pages
 
 * [Tutorial](doc/TUTORIAL.md)
 * [Documentation](doc/DOCUMENTATION.md)
 * [Examples](doc/EXAMPLES.md)
-* [Comparison with similar libraries](doc/COMPARISON.md)
 
 ## TODO
 

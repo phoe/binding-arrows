@@ -1,14 +1,14 @@
-(defpackage #:arrows
-  (:use #:common-lisp)
+(defpackage #:binding-arrows
+  (:use #:cl)
   (:export #:-> #:->> #:-<> #:-<>> #:->*
            #:some-> #:some->> #:some-<> #:some-<>>
            #:cond-> #:cond->> #:cond-<> #:cond-<>>
            #:as-> #:as->*))
 
-(in-package #:arrows)
+(in-package #:binding-arrows)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;; Arrow expansion function
+;;; Main arrow expansion function
 
 (defun ensure-cons (thing)
   (if (consp thing) thing (list thing)))
@@ -18,19 +18,67 @@
       form
       (funcall value-fn prev-symbol (ensure-cons form))))
 
-(defun expand-arrow
-    (forms &key (symbol-fn (lambda () (gensym "VAR"))) (value-fn #'value-first))
-  (let ((length (length forms)))
-    (case length
-      (0 'nil)
-      (1 (first forms))
-      (t (loop with symbols = (loop repeat length collect (funcall symbol-fn))
-               for form in forms
-               for prev-symbol = nil then next-symbol
-               for next-symbol in symbols
-               for value-form = (make-value-form value-fn prev-symbol form)
-               collect `(,next-symbol ,value-form) into bindings
-               finally (return `(let* ,bindings ,next-symbol)))))))
+(defun expand-aux (forms symbol-fn value-fn return-fn &optional env)
+  (loop with symbol-fn = (or symbol-fn (lambda () (gensym "VAR")))
+        with value-fn = (or value-fn #'value-first)
+        with length = (length forms)
+        with symbols = (loop repeat length collect (funcall symbol-fn))
+        for form in forms
+        for prev-symbol = nil then next-symbol
+        for next-symbol in symbols
+        for value-form = (make-value-form value-fn prev-symbol form)
+        collect value-form into value-forms
+        finally (return (funcall return-fn symbols value-forms env))))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;; Arrow expander
+
+(defun expand-arrow-return (symbols value-forms env)
+  (declare (ignore env))
+  `(let* ,(mapcar #'list symbols value-forms)
+     ,(car (last symbols))))
+
+(defun expand-arrow (forms &key symbol-fn value-fn)
+  (case (length forms)
+    (0 'nil)
+    (1 (first forms))
+    (t (expand-aux forms symbol-fn value-fn #'expand-arrow-return))))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;; Arrow SETF expander
+
+(defun expand-arrow-setf-return (symbols value-forms env)
+  (multiple-value-bind (vars vals stores store-fn access-fn)
+      (get-setf-expansion (car (last value-forms)) env)
+    (values (append (butlast symbols) vars)
+            (append (butlast value-forms) vals)
+            stores
+            store-fn
+            access-fn)))
+
+(defun expand-arrow-setf (forms env &key symbol-fn value-fn)
+  (case (length forms)
+    (0 (error "Cannot get the SETF expansion of an empty threading macro."))
+    (1 (get-setf-expansion (first forms)))
+    (t (expand-aux forms symbol-fn value-fn #'expand-arrow-setf-return env))))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;; Macrology
+
+(defmacro define-arrow (name lambda-list &body body)
+  (let ((env (gensym "ENV"))
+        (args (gensym "ARGS"))
+        (flet-forms (gensym "FORMS")))
+    (flet ((generate-macro (macro-name expand-fn &optional env)
+             `(,macro-name
+               ,name (,@lambda-list ,@(when env `(&environment ,env)))
+               (flet ((expand (,flet-forms &rest ,args)
+                        (apply #',expand-fn ,flet-forms ,@(when env `(,env))
+                               ,args)))
+                 ,@body))))
+      `(progn ,(generate-macro 'defmacro 'expand-arrow)
+              ,(generate-macro 'define-setf-expander 'expand-arrow-setf env)
+              ',name))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Value functions
@@ -95,50 +143,50 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Arrow implementations
 
-(defmacro -> (&rest forms)
-  (expand-arrow forms))
+(define-arrow -> (&rest forms)
+  (expand forms))
 
-(defmacro ->> (&rest forms)
-  (expand-arrow forms :value-fn #'value-last))
+(define-arrow ->> (&rest forms)
+  (expand forms :value-fn #'value-last))
 
-(defmacro -<> (&rest forms)
-  (expand-arrow forms :value-fn #'diamond-value-first))
+(define-arrow -<> (&rest forms)
+  (expand forms :value-fn #'diamond-value-first))
 
-(defmacro -<>> (&rest forms)
-  (expand-arrow forms :value-fn #'diamond-value-last))
+(define-arrow -<>> (&rest forms)
+  (expand forms :value-fn #'diamond-value-last))
 
-(defmacro some-> (&rest forms)
-  (expand-arrow forms :value-fn #'some-value-first))
+(define-arrow some-> (&rest forms)
+  (expand forms :value-fn #'some-value-first))
 
-(defmacro some->> (&rest forms)
-  (expand-arrow forms :value-fn #'some-value-last))
+(define-arrow some->> (&rest forms)
+  (expand forms :value-fn #'some-value-last))
 
-(defmacro some-<> (&rest forms)
-  (expand-arrow forms :value-fn #'some-diamond-value-first))
+(define-arrow some-<> (&rest forms)
+  (expand forms :value-fn #'some-diamond-value-first))
 
-(defmacro some-<>> (&rest forms)
-  (expand-arrow forms :value-fn #'some-diamond-value-last))
+(define-arrow some-<>> (&rest forms)
+  (expand forms :value-fn #'some-diamond-value-last))
 
-(defmacro cond-> (&rest forms)
-  (expand-arrow forms :value-fn #'cond-value-first))
+(define-arrow cond-> (&rest forms)
+  (expand forms :value-fn #'cond-value-first))
 
-(defmacro cond->> (&rest forms)
-  (expand-arrow forms :value-fn #'cond-value-last))
+(define-arrow cond->> (&rest forms)
+  (expand forms :value-fn #'cond-value-last))
 
-(defmacro cond-<> (&rest forms)
-  (expand-arrow forms :value-fn #'cond-diamond-value-first))
+(define-arrow cond-<> (&rest forms)
+  (expand forms :value-fn #'cond-diamond-value-first))
 
-(defmacro cond-<>> (&rest forms)
-  (expand-arrow forms :value-fn #'cond-diamond-value-last))
+(define-arrow cond-<>> (&rest forms)
+  (expand forms :value-fn #'cond-diamond-value-last))
 
-(defmacro ->* (&rest forms)
+(define-arrow ->* (&rest forms)
   (let ((forms (append (last forms) (butlast forms))))
-    (expand-arrow forms)))
+    (expand forms)))
 
-(defmacro as-> (initial-form var &rest forms)
+(define-arrow as-> (initial-form var &rest forms)
   (let ((forms (cons initial-form forms)))
-    (expand-arrow forms :symbol-fn (constantly var) :value-fn #'as-value)))
+    (expand forms :symbol-fn (constantly var) :value-fn #'as-value)))
 
-(defmacro as->* (var &rest forms)
+(define-arrow as->* (var &rest forms)
   (let ((forms (append (last forms) (butlast forms))))
-    (expand-arrow forms :symbol-fn (constantly var) :value-fn #'as-value)))
+    (expand forms :symbol-fn (constantly var) :value-fn #'as-value)))

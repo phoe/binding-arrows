@@ -1,11 +1,9 @@
-(in-package #:cl-user)
+(defpackage #:binding-arrows/test
+  (:use #:cl #:binding-arrows #:hu.dwim.stefil))
 
-(defpackage #:arrows/test
-  (:use #:cl #:arrows #:hu.dwim.stefil))
+(in-package #:binding-arrows/test)
 
-(in-package #:arrows/test)
-
-(defsuite* test-arrows)
+(defsuite* test-binding-arrows)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Correctness tests

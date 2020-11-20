@@ -1,4 +1,4 @@
-(in-package #:arrows)
+(in-package #:binding-arrows)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Documentation
