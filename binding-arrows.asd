@@ -2,7 +2,8 @@
   :version "1.0.0"
   :author "Michał \"phoe\" Herda <phoe@disroot.org>"
   :license "MIT"
-  :description "An implementation of binding threading macros"
+  :description
+  "An implementation of threading macros based on binding anonymous variables"
   :pathname "src"
   :components ((:file "binding-arrows")
                (:file "documentation"))
