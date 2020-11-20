@@ -4,9 +4,9 @@ An implementation of threading macros based on binding anonymous variables.
 
 ## Overview
 
-This system implements binding threading macros - a kind of threading macros with different semantics than classical, [Clojure core threading macros](https://clojure.org/guides/threading_macros) or their extension, [swiss-arrows](https://github.com/rplevy/swiss-arrows). Two Common Lisp implementations of those are [`arrows`](https://github.com/Harleqin/arrows) and [`arrow-macros`](https://github.com/hipeta/arrow-macros).
+This system implements binding threading macros - a kind of threading macros with different semantics than classical, [Clojure core threading macros](https://clojure.org/guides/threading_macros) or their extension, [swiss-arrows](https://github.com/rplevy/swiss-arrows). Two Common Lisp implementations of those are [arrows](https://github.com/Harleqin/arrows) and [arrow-macros](https://github.com/hipeta/arrow-macros).
 
-This system is a fork of [`arrows`](https://github.com/Harleqin/arrows) with changes in semantics that make it impossible to merge back upstream.
+This system is a fork of [arrows](https://github.com/Harleqin/arrows) with changes in semantics that make it impossible to merge back upstream.
 
 ## What's the difference?
 
