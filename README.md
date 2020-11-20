@@ -51,6 +51,10 @@ All of the aforementioned threading macros name valid places for use in `setf`.
 * [Documentation](doc/DOCUMENTATION.md)
 * [Examples](doc/EXAMPLES.md)
 
+## License
+
+MIT.
+
 ## TODO
 
 * Finish the tutorial
