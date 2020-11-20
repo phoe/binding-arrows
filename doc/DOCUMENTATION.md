@@ -2,7 +2,7 @@
 
 ## Macro `->`
 * The thread-first threading macro.
-* Lambda list: `(-> &rest forms)`
+* Lambda list: `(-> &body forms)`
 
 Binds anonymous variables and threads them into subsequent forms as their first
 arguments.
@@ -11,9 +11,9 @@ For example, the following form:
 
 ```lisp
 (-> foo
-    bar
-    (baz)
-    (quux 1 2 3))
+  bar
+  (baz)
+  (quux 1 2 3))
 ```
 
 Is equivalent to:
@@ -28,7 +28,7 @@ Is equivalent to:
 
 ## Macro `->>`
 * The thread-last threading macro.
-* Lambda list: `(->> &rest forms)`.
+* Lambda list: `(->> &body forms)`.
 
 Binds anonymous variables and threads them into subsequent forms as their last
 arguments.
@@ -37,9 +37,9 @@ For example, the following form:
 
 ```lisp
 (->> foo
-     bar
-     (baz)
-     (quux 1 2 3))
+  bar
+  (baz)
+  (quux 1 2 3))
 ```
 
 Is equivalent to:
@@ -54,7 +54,7 @@ Is equivalent to:
 
 ## Macro `-<>`
 * The diamond wand threading macro.
-* Lambda list: `(-<> &rest forms)`
+* Lambda list: `(-<> &body forms)`
 
 Binds anonymous variables and threads them into subsequent forms:
   * by substituting diamond symbols (`<>`) if they are present in the form,
@@ -69,11 +69,11 @@ For example, the following form:
 
 ```lisp
 (-<> foo
-     bar
-     (baz)
-     (quux 1 2 3)
-     (fred 4 5 6 <>)
-     (frob 7 <> 8 <> 9))
+  bar
+  (baz)
+  (quux 1 2 3)
+  (fred 4 5 6 <>)
+  (frob 7 <> 8 <> 9))
 ```
 
 Is equivalent to:
@@ -90,7 +90,7 @@ Is equivalent to:
 
 ## Macro `-<>>`
 * The diamond spear threading macro.
-* Lambda list: `(-<>> &rest forms)`
+* Lambda list: `(-<>> &body forms)`
 
 Binds anonymous variables and threads them into subsequent forms:
   * by substituting diamond symbols (`<>`) if they are present in the form,
@@ -105,11 +105,11 @@ For example, the following form:
 
 ```lisp
 (-<>> foo
-      bar
-      (baz)
-      (quux 1 2 3)
-      (fred 4 5 6 <>)
-      (frob 7 <> 8 <> 9))
+  bar
+  (baz)
+  (quux 1 2 3)
+  (fred 4 5 6 <>)
+  (frob 7 <> 8 <> 9))
 ```
 
 Is equivalent to:
@@ -126,7 +126,7 @@ Is equivalent to:
 
 ## Macro `some->`
 * The short-cicruiting thread-first threading macro.
-* Lambda list: `(some-> &rest forms)`
+* Lambda list: `(some-> &body forms)`
 
 Binds anonymous variables and threads them into subsequent forms as their first
 arguments. If any form returns `nil`, the subsequent forms are not evaluated,
@@ -136,9 +136,9 @@ For example, the following form:
 
 ```lisp
 (some-> foo
-        bar
-        (baz)
-        (quux 1 2 3))
+  bar
+  (baz)
+  (quux 1 2 3))
 ```
 
 Is equivalent to:
@@ -153,7 +153,7 @@ Is equivalent to:
 
 ## Macro `some->>`
 * The short-cicruiting thread-last threading macro.
-* Lambda list: `(sone->> &rest forms)`
+* Lambda list: `(sone->> &body forms)`
 
 Binds anonymous variables and threads them into subsequent forms as their last
 arguments. If any form returns `nil`, the subsequent forms are not evaluated,
@@ -163,9 +163,9 @@ For example, the following form:
 
 ```lisp
 (some->> foo
-         bar
-         (baz)
-         (quux 1 2 3))
+  bar
+  (baz)
+  (quux 1 2 3))
 ```
 
 Is equivalent to:
@@ -180,7 +180,7 @@ Is equivalent to:
 
 ## Macro `some-<>`
 * The short-cicruiting diamond thread-first threading macro.
-* Lambda list: `(some-<> &rest forms)`
+* Lambda list: `(some-<> &body forms)`
 
 Binds anonymous variables and threads them into subsequent forms:
   * by substituting diamond symbols (`<>`) if they are present in the form,
@@ -193,9 +193,9 @@ For example, the following form:
 
 ```lisp
 (some-<> foo
-         bar
-         (baz :baz)
-         (quux 1 <> 2 3))
+  bar
+  (baz :baz)
+  (quux 1 <> 2 3))
 ```
 
 Is equivalent to:
@@ -210,7 +210,7 @@ Is equivalent to:
 
 ## Macro `some-<>>`
 * The short-cicruiting diamond thread-last threading macro.
-* Lambda list: `(some-<> &rest forms)`
+* Lambda list: `(some-<> &body forms)`
 
 Binds anonymous variables and threads them into subsequent forms:
   * by substituting diamond symbols (`<>`) if they are present in the form,
@@ -223,9 +223,9 @@ For example, the following form:
 
 ```lisp
 (some-<>> foo
-          bar
-          (baz :baz)
-          (quux 1 <> 2 3))
+  bar
+  (baz :baz)
+  (quux 1 <> 2 3))
 ```
 
 Is equivalent to:
@@ -240,7 +240,7 @@ Is equivalent to:
 
 ## Macro `cond->`
 * The conditional thread-first threading macro.
-* Lambda list: `(cond-> &rest forms)`
+* Lambda list: `(cond-> &body forms)`
   * Each form must have the structure of `(test . forms)`.
 
 Binds a single anonymous variable and threads it into the subsequent forms as
@@ -250,9 +250,9 @@ For example, the following form:
 
 ```lisp
 (cond-> foo
-        (barp x y z)
-        (bazp (baz))
-        ((quuxp thing) (quux 1 2 3)))
+  (barp x y z)
+  (bazp (baz))
+  ((quuxp thing) (quux 1 2 3)))
 ```
 
 Is equivalent to:
@@ -273,7 +273,7 @@ Is equivalent to:
 
 ## Macro `cond->>`
 * The conditional thread-last threading macro.
-* Lambda list: `(cond-> &rest forms)`
+* Lambda list: `(cond-> &body forms)`
   * Each form must have the structure of `(test . forms)`.
 
 Binds a single anonymous variable and threads it into the subsequent forms as
@@ -283,9 +283,9 @@ For example, the following form:
 
 ```lisp
 (cond->> foo
-         (barp x y z)
-         (bazp (baz))
-         ((quuxp thing) (quux 1 2 3)))
+  (barp x y z)
+  (bazp (baz))
+  ((quuxp thing) (quux 1 2 3)))
 ```
 
 Is equivalent to:
@@ -306,7 +306,7 @@ Is equivalent to:
 
 ## Macro `cond-<>`
 * The conditional diamond thread-first threading macro.
-* Lambda list: `(cond-> &rest forms)`
+* Lambda list: `(cond-> &body forms)`
   * Each form must have the structure of `(test . forms)`.
  
 Binds anonymous variables and threads them into subsequent forms:
@@ -322,9 +322,9 @@ For example, the following form:
 
 ```lisp
 (cond-<> foo
-         (barp x y z)
-         (bazp (baz))
-         ((quuxp thing) (quux 1 <> 2 3)))
+  (barp x y z)
+  (bazp (baz))
+  ((quuxp thing) (quux 1 <> 2 3)))
 ```
 
 Is equivalent to:
@@ -345,7 +345,7 @@ Is equivalent to:
 
 ## Macro `cond-<>>`
 * The conditional diamond thread-last threading macro.
-* Lambda list: `(cond-> &rest forms)`
+* Lambda list: `(cond-> &body forms)`
   * Each form must have the structure of `(test . forms)`.
  
 Binds anonymous variables and threads them into subsequent forms:
@@ -360,10 +360,10 @@ returned.
 For example, the following form:
 
 ```lisp
-(cond-<> foo
-         (barp x y z)
-         (bazp (baz))
-         ((quuxp thing) (quux 1 <> 2 3)))
+(cond-<>> foo
+  (barp x y z)
+  (bazp (baz))
+  ((quuxp thing) (quux 1 <> 2 3)))
 ```
 
 Is equivalent to:
@@ -371,20 +371,20 @@ Is equivalent to:
 ```lisp
 (let* ((temp1 foo)
        (temp2 (if barp
-                  (-<> temp1 x y z)
+                  (-<>> temp1 x y z)
                   temp1))
        (temp3 (if bazp
-                  (-<> temp2 (baz))
+                  (-<>> temp2 (baz))
                   temp2))
        (temp4 (if (quuxp thing)
-                  (-<> temp3 (quux 1 <> 2 3))
+                  (-<>> temp3 (quux 1 <> 2 3))
                   temp3)))
   temp4)
 ```
 
 ## Macro `->*`
 * The inverted thread-first threading macro.
-* Lambda list: `(->* &rest forms)`
+* Lambda list: `(->* &body forms)`
 
 Binds anonymous variables and threads them into subsequent forms as their first
 arguments. The order of the forms is altered, so that the last form is used as
@@ -394,18 +394,18 @@ For example, the following form:
 
 ```lisp
 (->* bar
-     (baz)
-     (quux 1 2 3)
-     foo)
+  (baz)
+  (quux 1 2 3)
+  foo)
 ```
 
 Is equivalent to:
 
 ```lisp
 (-> foo
-    bar
-    (baz)
-    (quux 1 2 3))
+  bar
+  (baz)
+  (quux 1 2 3))
 ```
 
 And therefore to:
@@ -420,7 +420,7 @@ And therefore to:
 
 ## Macro `as->`
 * The named threading macro.
-* Lambda list: `(as-> initial-form variable &rest forms)`
+* Lambda list: `(as-> initial-form var &body forms)`
 
 Binds the provided variable to subsequent forms, which may make use of the
 bound variable.
@@ -429,9 +429,9 @@ For example, the following form:
 
 ```lisp
 (as-> foo var
-      (bar var)
-      (baz var)
-      (quux 1 2 3))
+  (bar var)
+  (baz var)
+  (quux 1 2 3))
 ```
 
 Is equivalent to:
@@ -446,7 +446,7 @@ Is equivalent to:
 
 ## Macro `as->*`
 * The inverted named threading macro.
-* Lambda list: `(as->* &rest forms)`
+* Lambda list: `(as->* var &body forms)`
 
 Binds the provided variable to subsequent forms, which may make use of the
 bound variable. The order of the forms is altered, so that the last form is used
@@ -456,19 +456,19 @@ For example, the following form:
 
 ```lisp
 (as->* var
-       (bar var)
-       (baz var)
-       (quux 1 2 3)
-       foo)
+  (bar var)
+  (baz var)
+  (quux 1 2 3)
+  foo)
 ```
 
 Is equivalent to:
 
 ```lisp
 (as-> foo var
-      (bar var)
-      (baz var)
-      (quux 1 2 3))
+  (bar var)
+  (baz var)
+  (quux 1 2 3))
 ```
 
 And therefore to:

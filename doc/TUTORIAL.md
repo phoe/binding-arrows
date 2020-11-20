@@ -180,38 +180,170 @@ This means that the above call is equivalent to:
 
 We can see that, unlike in short-circuiting threading macros, all of the tests are evaluated in order. If the test succeeds, then the new value of the binding is generated using the inner threading macro; otherwise, the old value is reused.
 
-## Inverted threading macros
+## Nesting threading macros
 
-One useful idiom is to nest these arrows. The basic example is to use `->>` inside `->`:
+Sometimes it is useful to nest threading macros. If we want to avoid using diamond macros in a situation where we want to splice our variables as first and last arguments, we can use a combination of nested `->` and `->>`.
 
-    (-> deeply-nested-plist
-        (getf :foo)
-        (getf :bar)
-        (->> (mapcar #'reverse)))
+The following example shows an example where we want to thread first arguments with the exception of a single form, in which we want to thread the last:
 
-This inspired the discovery of `->*`, which enables the inverse nesting:
+```lisp
+(-> deeply-nested-plist
+    (getf :foo)
+    (getf :bar)
+    (->> (mapcar #'reverse)))
+```
 
-    (->> deeply-nested-alist
-         (assoc :foo)
-         cdr
-         (assoc :bar)
-         cdr
-         (->* (mod 3))
-         (expt 2))
+Is equivalent to:
 
-Generally useful for overriding defaults are `as->` and `as->*`:
+```lisp
+(let* ((temp1 deeply-nested-plist)
+       (temp2 (getf temp1 :foo))
+       (temp3 (getf temp2 :bar))
+       (temp4 (->> temp3 (mapcar #'reverse))))
+  temp4)
+```
 
-    (-> 3
-        (as-> $
-              (< x $ y))
-        not)
+And therefore to:
 
-    (some->> 15
-             (as->* $
-                    (progn
-                      (format t debug-formatter $)
-                      $))
-             (/ 75))
+```lisp
+(let* ((temp1 deeply-nested-plist)
+       (temp2 (getf temp1 :foo))
+       (temp3 (getf temp2 :bar))
+       (temp4 (mapcar #'reverse temp3)))
+  temp4)
+```
 
-However, don't overdo it!  This quickly leads to an unreadable mess.  You may
-well be better off with a few explicit `let` bindings.
+An equivalent call of a diamond threading macro would look like the following:
+
+```lisp
+(-<> deeply-nested-plist
+     (getf :foo)
+     (getf :bar)
+     (mapcar #'reverse <>))
+```
+
+The inverse of the aforementioned order is possible by the use of the inverted threading macro `->*`, which allows to thread last arguments with an exceptional case of binding the first argument.
+
+The following example:
+
+```lisp
+(->> deeply-nested-alist
+     (assoc :foo)
+     cdr
+     (assoc :bar)
+     cdr
+     (->* (mod 3))
+     (expt 2))
+```
+
+Is equivalent to:
+
+```lisp
+(let* ((temp1 deeply-nested-alist)
+       (temp2 (assoc :foo temp1))
+       (temp3 (cdr temp2))
+       (temp4 (assoc :bar temp3))
+       (temp5 (cdr temp4))
+       (temp6 (->* (mod 3) temp5))
+       (temp7 (expt 2 temp6)))
+  temp7)
+```
+
+And therefore to:
+
+```lisp
+(let* ((temp1 deeply-nested-alist)
+       (temp2 (assoc :foo temp1))
+       (temp3 (cdr temp2))
+       (temp4 (assoc :bar temp3))
+       (temp5 (cdr temp4))
+       (temp6 (mod temp5 3))
+       (temp7 (expt 2 temp6)))
+  temp7)
+```
+
+An equivalent call of a diamond threading macro would look like the following:
+
+```lisp
+(-<>> deeply-nested-alist
+      (assoc :foo)
+      cdr
+      (assoc :bar)
+      cdr
+      (mod <> 3)
+      (expt 2))
+```
+
+## Named threading macros
+
+Named threading macros permit the use of named variables and therefore allow for inserting blocks of non-threaded Lisp code into otherwise threaded sequences. This allows for easy inspection and overriding of values, especially in complex threading macro calls.
+
+The threading macros that are useful for this are `as->` (for thread-first macros) and `as->*` (for thread-last macros). An example of the former is:
+
+```lisp
+(-> 3
+  (as-> var
+    (< x var y))
+  not)
+```
+
+Which is equivalent to:
+
+```lisp
+(let* ((temp1 3)
+       (temp2 (as-> temp1 var
+                (< x var y)))
+       (temp3 (not temp2)))
+  temp3)
+```
+
+And therefore to:
+
+```lisp
+(let* ((temp1 3)
+       (var temp1)
+       (var (< x var y))
+       (temp2 var)
+       (temp3 (not temp2)))
+  temp3)
+```
+
+A similar example for `as->*` may look like the following:
+
+```lisp
+(some->> 15
+  (as->* var
+    (progn (format t ";; Debug: ~S~%" var)
+           var))
+  (/ 75))
+```
+
+Which is equivalent to:
+
+```lisp
+(let* ((temp1 15)
+       (temp2 (if temp1
+                  (as->* var
+                    (progn (format t ";; debug: ~s~%" var) var)
+                    temp1)
+                  nil))
+       (temp3 (if temp2
+                  (/ 75 temp2)
+                  nil)))
+  temp3)
+```
+
+And therefore to:
+
+```lisp
+(let* ((temp1 15)
+       (var temp1))
+  (format t ";; debug: ~s~%" var)
+  (let* ((temp2 var)
+         (temp3 (if temp2
+                    (/ 75 temp2)
+                    nil)))
+    temp3))
+```
+
+As useful as named threading macros are, they may contribute negatively to code readability. If that becomes the case, it might be better to use explicit `let` bindings.

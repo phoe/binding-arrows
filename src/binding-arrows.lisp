@@ -155,58 +155,58 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Arrow implementations
 
-(define-arrow -> (&rest forms)
+(define-arrow -> (&body forms)
   (expand forms))
 
-(define-arrow ->> (&rest forms)
+(define-arrow ->> (&body forms)
   (expand forms :value-fn #'value-last))
 
-(define-arrow -<> (&rest forms)
+(define-arrow -<> (&body forms)
   (expand forms :value-fn #'diamond-value-first))
 
-(define-arrow -<>> (&rest forms)
+(define-arrow -<>> (&body forms)
   (expand forms :value-fn #'diamond-value-last))
 
-(define-arrow some-> (&rest forms)
+(define-arrow some-> (&body forms)
   (expand forms :value-fn #'some-value-first
                 :return-fn #'expand-arrow-setf-if-return))
 
-(define-arrow some->> (&rest forms)
+(define-arrow some->> (&body forms)
   (expand forms :value-fn #'some-value-last
                 :return-fn #'expand-arrow-setf-if-return))
 
-(define-arrow some-<> (&rest forms)
+(define-arrow some-<> (&body forms)
   (expand forms :value-fn #'some-diamond-value-first
                 :return-fn #'expand-arrow-setf-if-return))
 
-(define-arrow some-<>> (&rest forms)
+(define-arrow some-<>> (&body forms)
   (expand forms :value-fn #'some-diamond-value-last
                 :return-fn #'expand-arrow-setf-if-return))
 
-(define-arrow cond-> (&rest forms)
+(define-arrow cond-> (&body forms)
   (expand forms :value-fn #'cond-value-first
                 :return-fn #'expand-arrow-setf-if-return))
 
-(define-arrow cond->> (&rest forms)
+(define-arrow cond->> (&body forms)
   (expand forms :value-fn #'cond-value-last
                 :return-fn #'expand-arrow-setf-if-return))
 
-(define-arrow cond-<> (&rest forms)
+(define-arrow cond-<> (&body forms)
   (expand forms :value-fn #'cond-diamond-value-first
                 :return-fn #'expand-arrow-setf-if-return))
 
-(define-arrow cond-<>> (&rest forms)
+(define-arrow cond-<>> (&body forms)
   (expand forms :value-fn #'cond-diamond-value-last
                 :return-fn #'expand-arrow-setf-if-return))
 
-(define-arrow ->* (&rest forms)
+(define-arrow ->* (&body forms)
   (let ((forms (append (last forms) (butlast forms))))
     (expand forms)))
 
-(define-arrow as-> (initial-form var &rest forms)
+(define-arrow as-> (initial-form var &body forms)
   (let ((forms (cons initial-form forms)))
     (expand forms :symbol-fn (constantly var) :value-fn #'as-value)))
 
-(define-arrow as->* (var &rest forms)
+(define-arrow as->* (var &body forms)
   (let ((forms (append (last forms) (butlast forms))))
     (expand forms :symbol-fn (constantly var) :value-fn #'as-value)))

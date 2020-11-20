@@ -12,9 +12,9 @@ arguments.
 For example, the following form:
 
   (-> foo
-      bar
-      (baz)
-      (quux 1 2 3))
+    bar
+    (baz)
+    (quux 1 2 3))
 
 Is equivalent to:
 
@@ -33,9 +33,9 @@ arguments.
 For example, the following form:
 
   (->> foo
-       bar
-       (baz)
-       (quux 1 2 3))
+    bar
+    (baz)
+    (quux 1 2 3))
 
 Is equivalent to:
 
@@ -60,11 +60,11 @@ see the ARROW-MACROS system for an implementation that performs code walking.
 For example, the following form:
 
   (-<> foo
-       bar
-       (baz)
-       (quux 1 2 3)
-       (fred 4 5 6 <>)
-       (frob 7 <> 8 <> 9))
+    bar
+    (baz)
+    (quux 1 2 3)
+    (fred 4 5 6 <>)
+    (frob 7 <> 8 <> 9))
 
 Is equivalent to:
 
@@ -91,11 +91,11 @@ see the ARROW-MACROS system for an implementation that performs code walking.
 For example, the following form:
 
   (-<>> foo
-        bar
-        (baz)
-        (quux 1 2 3)
-        (fred 4 5 6 <>)
-        (frob 7 <> 8 <> 9))
+    bar
+    (baz)
+    (quux 1 2 3)
+    (fred 4 5 6 <>)
+    (frob 7 <> 8 <> 9))
 
 Is equivalent to:
 
@@ -117,9 +117,9 @@ NIL is returned.
 For example, the following form:
 
   (some-> foo
-          bar
-          (baz)
-          (quux 1 2 3))
+    bar
+    (baz)
+    (quux 1 2 3))
 
 Is equivalent to:
 
@@ -139,9 +139,9 @@ NIL is returned.
 For example, the following form:
 
   (some->> foo
-           bar
-           (baz)
-           (quux 1 2 3))
+    bar
+    (baz)
+    (quux 1 2 3))
 
 Is equivalent to:
 
@@ -164,9 +164,9 @@ returned.
 For example, the following form:
 
   (some-<> foo
-           bar
-           (baz :baz)
-           (quux 1 <> 2 3))
+    bar
+    (baz :baz)
+    (quux 1 <> 2 3))
 
 Is equivalent to:
 
@@ -188,10 +188,10 @@ returned.
 
 For example, the following form:
 
-  (some-<> foo
-           bar
-           (baz :baz)
-           (quux 1 <> 2 3))
+  (some-<>> foo
+    bar
+    (baz :baz)
+    (quux 1 <> 2 3))
 
 Is equivalent to:
 
@@ -210,9 +210,9 @@ first arguments, but only when the test of a given form returns true.
 For example, the following form:
 
   (cond-> foo
-          (barp x y z)
-          (bazp (baz))
-          ((quuxp thing) (quux 1 2 3)))
+    (barp x y z)
+    (bazp (baz))
+    ((quuxp thing) (quux 1 2 3)))
 
 Is equivalent to:
 
@@ -237,9 +237,9 @@ last arguments, but only when the test of a given form returns true.
 For example, the following form:
 
   (cond->> foo
-           (barp x y z)
-           (bazp (baz))
-           ((quuxp thing) (quux 1 2 3)))
+    (barp x y z)
+    (bazp (baz))
+    ((quuxp thing) (quux 1 2 3)))
 
 Is equivalent to:
 
@@ -270,9 +270,9 @@ returned.
 For example, the following form:
 
   (cond-<> foo
-           (barp x y z)
-           (bazp (baz))
-           ((quuxp thing) (quux 1 <> 2 3)))
+    (barp x y z)
+    (bazp (baz))
+    ((quuxp thing) (quux 1 <> 2 3)))
 
 Is equivalent to:
 
@@ -303,9 +303,9 @@ returned.
 For example, the following form:
 
   (cond-<>> foo
-            (barp x y z)
-            (bazp (baz))
-            ((quuxp thing) (quux 1 <> 2 3)))
+    (barp x y z)
+    (bazp (baz))
+    ((quuxp thing) (quux 1 <> 2 3)))
 
 Is equivalent to:
 
@@ -331,16 +331,16 @@ the initialization form.
 For example, the following form:
 
   (->* bar
-       (baz)
-       (quux 1 2 3)
-       foo)
+    (baz)
+    (quux 1 2 3)
+    foo)
 
 Is equivalent to:
 
   (-> foo
-      bar
-      (baz)
-      (quux 1 2 3))
+    bar
+    (baz)
+    (quux 1 2 3))
 
 And therefore to:
 
@@ -359,9 +359,9 @@ bound variable.
 For example, the following form:
 
   (as-> foo var
-        (bar var)
-        (baz var)
-        (quux 1 2 3))
+    (bar var)
+    (baz var)
+    (quux 1 2 3))
 
 Is equivalent to:
 
@@ -381,17 +381,17 @@ as the initialization form for the variable.
 For example, the following form:
 
   (as->* var
-         (bar var)
-         (baz var)
-         (quux 1 2 3)
-         foo)
+    (bar var)
+    (baz var)
+    (quux 1 2 3)
+    foo)
 
 Is equivalent to:
 
   (as-> foo var
-        (bar var)
-        (baz var)
-        (quux 1 2 3))
+    (bar var)
+    (baz var)
+    (quux 1 2 3))
 
 And therefore to:
 
