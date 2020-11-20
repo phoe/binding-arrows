@@ -1,5 +1,7 @@
 # Arrows - Examples
 
+See [the test suite](../t/test.lisp) for even more examples.
+
 ## Arrow macros
 
 ```lisp
