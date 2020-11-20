@@ -392,22 +392,22 @@
 
 (deftest setf-cond-> ()
   (let ((list (list 1 2 3 4 5)))
-    (setf (cond-> 0 (t (nthcdr list))(t cdr) (nil car) (t cdr) (t car)) 42)
+    (setf (cond-> 0 (t (nthcdr list)) (t cdr) (nil car) (t cdr) (t car)) 42)
     (is (equal list '(1 2 42 4 5)))))
 
 (deftest setf-cond->> ()
   (let ((list (list 1 2 3 4 5)))
-    (setf (cond->> list (t (nthcdr 0))(t cdr) (nil car) (t cdr) (t car)) 42)
+    (setf (cond->> list (t (nthcdr 0)) (t cdr) (nil car) (t cdr) (t car)) 42)
     (is (equal list '(1 2 42 4 5)))))
 
 (deftest setf-cond-<> ()
   (let ((list (list 1 2 3 4 5)))
-    (setf (cond-<> 0 (t (nthcdr <> list))(t cdr) (nil car) (t cdr) (t car)) 42)
+    (setf (cond-<> 0 (t (nthcdr <> list)) (t cdr) (nil car) (t cdr) (t car)) 42)
     (is (equal list '(1 2 42 4 5)))))
 
 (deftest setf-cond-<>> ()
   (let ((list (list 1 2 3 4 5)))
-    (setf (cond-<>> 0 (t (nthcdr <> list))(t cdr) (nil car) (t cdr) (t car)) 42)
+    (setf (cond-<>> 0 (t (nthcdr <> list)) (t cdr) (nil car) (t cdr) (t car)) 42)
     (is (equal list '(1 2 42 4 5)))))
 
 (deftest setf-->* ()

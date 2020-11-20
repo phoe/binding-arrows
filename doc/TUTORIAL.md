@@ -377,4 +377,6 @@ And therefore to the following:
 (rplaca (cdr (cdr (nthcdr 0 list))) 42)
 ```
 
-The `some` family of macros interacts differently with `setf` as a part of its short-circuiting.
+The `some` family of macros interacts differently with `setf` as a part of its short-circuiting. If the short-circuit is engaged anywhere in the thread, then the setting is not executed. (The `setf` form still returns the new value in order to preserve language semantics, but it does not.)
+
+`setf` of `cond`s are currently buggy since they only generate `setf` forms for the last form, whereas they should take other branches into account as well.
