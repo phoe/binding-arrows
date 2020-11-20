@@ -14,7 +14,7 @@
   :author "Michał \"phoe\" Herda <phoe@disroot.org>"
   :license "MIT"
   :description "Test suite for Binding Arrows"
-  :depends-on (#:arrows #:hu.dwim.stefil)
+  :depends-on (#:binding-arrows #:hu.dwim.stefil)
   :pathname "t"
   :components ((:file "test"))
   :perform (asdf:test-op (c v) (uiop:symbol-call '#:binding-arrows/test

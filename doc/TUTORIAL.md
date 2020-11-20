@@ -20,9 +20,9 @@ A threading macro is equivalent to a series of lexical variable bindings, where 
 
 ```lisp
 (-> foo
-    bar
-    (baz)
-    (quux 1 2 3))
+  bar
+  (baz)
+  (quux 1 2 3))
 ```
 
 This call is equivalent to:
@@ -49,9 +49,9 @@ If we used a thread-last macro instead:
 
 ```lisp
 (->> foo
-     bar
-     (baz)
-     (quux 1 2 3))
+  bar
+  (baz)
+  (quux 1 2 3))
 ```
 
 Then the equivalent resultant form would look like this:
@@ -132,9 +132,9 @@ For example, the following form:
 
 ```lisp
 (some-> foo
-        bar
-        (baz)
-        (quux 1 2 3))
+  bar
+  (baz)
+  (quux 1 2 3))
 ```
 
 Is equivalent to:
@@ -157,9 +157,9 @@ Each binding in a conditional threaded macro is composed of a test (the `car` of
 
 ```lisp
 (cond-> foo
-        (barp x y z)
-        (bazp (baz))
-        ((quuxp thing) (quux 1 2 3)))
+  (barp x y z)
+  (bazp (baz))
+  ((quuxp thing) (quux 1 2 3)))
 ```
 
 The first form is treated as-is. The second and subsequent forms are composed of a test (`barp`, `bazp`, `(quuxp thing)`) and forms to thread through if the respective test evaluates to true.
@@ -190,9 +190,9 @@ The following example shows an example where we want to thread first arguments w
 
 ```lisp
 (-> deeply-nested-plist
-    (getf :foo)
-    (getf :bar)
-    (->> (mapcar #'reverse)))
+  (getf :foo)
+  (getf :bar)
+  (->> (mapcar #'reverse)))
 ```
 
 Is equivalent to:
@@ -219,9 +219,9 @@ An equivalent call of a diamond threading macro would look like the following:
 
 ```lisp
 (-<> deeply-nested-plist
-     (getf :foo)
-     (getf :bar)
-     (mapcar #'reverse <>))
+  (getf :foo)
+  (getf :bar)
+  (mapcar #'reverse <>))
 ```
 
 The inverse of the aforementioned order is possible by the use of the inverted threading macro `->*`, which allows to thread last arguments with an exceptional case of binding the first argument.
@@ -230,12 +230,12 @@ The following example:
 
 ```lisp
 (->> deeply-nested-alist
-     (assoc :foo)
-     cdr
-     (assoc :bar)
-     cdr
-     (->* (mod 3))
-     (expt 2))
+  (assoc :foo)
+  cdr
+  (assoc :bar)
+  cdr
+  (->* (mod 3))
+  (expt 2))
 ```
 
 Is equivalent to:
@@ -376,3 +376,5 @@ And therefore to the following:
 ```lisp
 (rplaca (cdr (cdr (nthcdr 0 list))) 42)
 ```
+
+The `some` family of macros interacts differently with `setf` as a part of its short-circuiting.
