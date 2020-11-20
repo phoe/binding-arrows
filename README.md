@@ -17,7 +17,7 @@ This has two main implications:
 * Binding threading macros expand into a `let*` form.
   * Binding threading macros are nicer to read when macroexpanded.
   * Binding threading macros preserve for the debugger.
-  * `setf` expansions are handled differently, but gracefully.
+  * `setf` expansions are handled by explicit `setf` expanders for each macro.
 * Binding threading macros implicitly assume that each computation step is evaluated.
   * This means that e.g. `(->> (loop) (or t))` is going to return `t` on a traditional (Clojure-like) implementation of threading macros, but **will hang** on a binding implementation.
 
