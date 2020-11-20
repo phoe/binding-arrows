@@ -4,7 +4,7 @@
 
 The name "threading macros" has nothing to do with multiprocessing. Instead, the term "thread" refers to a piece of string that is driven by a needle through multiple layers of fabric. Threading macros work in a similar way, driving results of evaluating previous expressions into next expressions.
 
-Traditional threading macros have their origins in [Clojure](https://clojure.org/guides/threading_macros) and have been further extended by a library named [swiss-arrows](https://github.com/rplevy/swiss-arrows). From there, they have found their way back into Common Lisp, and from there, I have ~~[accidentally](https://github.com/Harleqin/arrows/pull/3)~~ created the variant of them named binding threading macros.
+Traditional threading macros have their origins in [Clojure](https://clojure.org/guides/threading_macros) and have been further extended by a library named [swiss-arrows](https://github.com/rplevy/swiss-arrows). From there, they have found their way back into Common Lisp, and from there, I have created the variant of them named binding threading macros ~~[as a failed experiment in rewriting a traditional implementation](https://github.com/Harleqin/arrows/pull/3)~~.
 
 **This tutorial only covers binding threading macros and does not apply to traditional binding macros.** Henceforth, we will refer to binding threading macros as just threading macros.
 
