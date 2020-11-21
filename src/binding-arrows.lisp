@@ -87,7 +87,7 @@
   (let ((conds (loop for symbol in (reverse (butlast symbols))
                      for (vars vals stores store-fn access-fn) in expansions
                      for bindings = (mapcar #'list vars vals)
-                     collect `(,symbol (let ,bindings ,access-fn)))))
+                     collect `(,symbol (let* ,bindings ,access-fn)))))
     `(cond ,@conds)))
 
 (defun expand-arrow-setf-cond-return (symbols value-forms env)
