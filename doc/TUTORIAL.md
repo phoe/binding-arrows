@@ -377,6 +377,21 @@ And therefore to the following:
 (rplaca (cdr (cdr (nthcdr 0 list))) 42)
 ```
 
+## Short-cirtuiting threading macros as places
+
 The `some` family of macros interacts differently with `setf` as a part of its short-circuiting. If the short-circuit is engaged anywhere in the thread, then the setting is not executed. (The `setf` form still returns the new value in order to preserve language semantics, but it does not set it to the place.)
 
-The `cond` family of macros interacts differently with `setf` as a part of its conditionalization. `setf` of a `cond` threading macro generates a complex `setf` expansion that takes all the multiple possibilities of setf places that are present in the thread; the proper branch to take is selected at runtime. Because of this, compile-time warnings may occur if non-places are present in the thread of a `cond` threading macro that is passed to `setf`.
+## Conditional threading macros as places
+
+The `cond` family of macros interacts differently with `setf` as a part of its conditionalization. `setf` of a `cond` threading macro generates a complex `setf` expansion that takes all the multiple possibilities of setf places that are present in the thread; the proper branch to take is selected at runtime.
+
+For instance, this call is capable of setting four different places in total depending on the values of boolean parameters `x` and `y`:
+
+```lisp
+(setf (cond-> cons
+        (x car)
+        (y cdr))
+      42)
+```
+
+Compile-time warnings may occur if non-places are present in the thread of a `cond` threading macro that is passed to `setf`.

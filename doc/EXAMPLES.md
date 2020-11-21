@@ -45,7 +45,7 @@ ARROWS> (-<> 3
 ```lisp
 ARROWS> (-<> 3
           (/ <> 2))
-          
+
 ;; (let ((x 3)) (/ 3 2))
 
 3/2
@@ -84,4 +84,50 @@ ARROWS> (let ((x 3))
 ;;   (+ y y))
 
 8
+```
+
+## Conditional threading macros
+
+```lisp
+BINDING-ARROWS> (let ((cons (cons (cons 1 2) 3)))
+                  (setf (cond-> cons
+                          (t car)
+                          (t cdr))
+                        42)
+                  cons)
+
+((1 . 42) . 3)
+```
+
+```lisp
+BINDING-ARROWS> (let ((cons (cons (cons 1 2) 3)))
+                  (setf (cond-> cons
+                          (nil car)
+                          (t cdr))
+                        42)
+                  cons)
+
+((1 . 2) . 42)
+```
+
+```lisp
+BINDING-ARROWS> (let ((cons (cons (cons 1 2) 3)))
+                  (setf (cond-> cons
+                          (t car)
+                          (nil cdr))
+                        42)
+                  cons)
+
+(42 . 3)
+```
+
+```lisp
+BINDING-ARROWS> (let ((cons (cons (cons 1 2) 3)))
+                  (setf (cond-> cons
+                          (nil car)
+                          (nil cdr))
+                        42)
+                  cons)
+
+42
 ```
