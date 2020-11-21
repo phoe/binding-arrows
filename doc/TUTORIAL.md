@@ -379,7 +379,7 @@ And therefore to the following:
 
 ## Short-cirtuiting threading macros as places
 
-The `some` family of macros interacts differently with `setf` as a part of its short-circuiting. If the short-circuit is engaged anywhere in the thread, then the setting is not executed. (The `setf` form still returns the new value in order to preserve language semantics, but it does not set it to the place.)
+The `some` family of macros interacts differently with `setf` as a part of its short-circuiting. If the short-circuit is engaged anywhere in the thread, then the setting is not executed. Regardless of whether the setting occurs, `setf` form still returns the new value in order to preserve language semantics.
 
 ## Conditional threading macros as places
 
@@ -394,4 +394,4 @@ For instance, this call is capable of setting four different places in total dep
       42)
 ```
 
-Compile-time warnings may occur if non-places are present in the thread of a `cond` threading macro that is passed to `setf`.
+If a `cond` macro is used in `setf`, all of the resulting threaded forms should be valid places. Otherwise, compile-time warnings may occur if non-places are present in the thread of a `cond` threading macro that is passed to `setf`.
