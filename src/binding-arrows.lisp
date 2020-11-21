@@ -74,9 +74,9 @@
 
 (defun cond-generate-store-fn (store value-forms expansions)
   (let ((conds (loop for value-form in (reverse (butlast value-forms))
-                     for test = (if (consp value-form)
-                                    (second value-form)
-                                    value-form)
+                     for test = (if (eq value-form (first value-forms))
+                                    value-form
+                                    (second value-form))
                      for (vars vals stores store-fn access-fn) in expansions
                      for bindings = (append (mapcar #'list vars vals)
                                             `((,(first stores) ,store)))
