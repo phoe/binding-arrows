@@ -68,26 +68,30 @@
             `(if ,(car (last (butlast symbols))) ,access-fn nil))))
 
 (defun cond-setf-expansions (value-forms env)
-  (loop for value-form in (cdr value-forms)
-        for place = (third value-form)
+  (loop for value-form in value-forms
+        for place = (if (eq value-form (first value-forms))
+                        value-form
+                        (third value-form))
         collect (multiple-value-list (get-setf-expansion place env))))
 
 (defun cond-generate-store-fn (store value-forms expansions)
-  (let ((conds (loop for value-form in (reverse (butlast value-forms))
+  (let ((conds (loop for value-form in value-forms
                      for test = (if (eq value-form (first value-forms))
                                     value-form
                                     (second value-form))
                      for (vars vals stores store-fn access-fn) in expansions
                      for bindings = (append (mapcar #'list vars vals)
                                             `((,(first stores) ,store)))
-                     collect `(,test (let* ,bindings ,store-fn)))))
-    `(prog1 ,store (cond ,@conds))))
+                     collect `(,test (let* ,bindings ,store-fn)) into result
+                     finally (return (nreverse result)))))
+    `(multiple-value-prog1 ,store (cond ,@conds))))
 
 (defun cond-generate-access-fn (symbols expansions)
-  (let ((conds (loop for symbol in (reverse (butlast symbols))
+  (let ((conds (loop for symbol in symbols
                      for (vars vals stores store-fn access-fn) in expansions
                      for bindings = (mapcar #'list vars vals)
-                     collect `(,symbol (let* ,bindings ,access-fn)))))
+                     collect `(,symbol (let* ,bindings ,access-fn)) into result
+                     finally (return (nreverse result)))))
     `(cond ,@conds)))
 
 (defun expand-arrow-setf-cond-return (symbols value-forms env)
