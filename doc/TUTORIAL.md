@@ -377,6 +377,6 @@ And therefore to the following:
 (rplaca (cdr (cdr (nthcdr 0 list))) 42)
 ```
 
-The `some` family of macros interacts differently with `setf` as a part of its short-circuiting. If the short-circuit is engaged anywhere in the thread, then the setting is not executed. (The `setf` form still returns the new value in order to preserve language semantics, but it does not.)
+The `some` family of macros interacts differently with `setf` as a part of its short-circuiting. If the short-circuit is engaged anywhere in the thread, then the setting is not executed. (The `setf` form still returns the new value in order to preserve language semantics, but it does not set it to the place.)
 
-`setf` of `cond`s are currently buggy since they only generate `setf` forms for the last form, whereas they should take other branches into account as well.
+The `cond` family of macros interacts differently with `setf` as a part of its conditionalization. `setf` of a `cond` threading macro generates a complex `setf` expansion that takes all the multiple possibilities of setf places that are present in the thread; the proper branch to take is selected at runtime. Because of this, compile-time warnings may occur if non-places are present in the thread of a `cond` threading macro that is passed to `setf`.

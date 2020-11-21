@@ -57,7 +57,7 @@
             store-fn
             access-fn)))
 
-(defun expand-arrow-setf-if-return (symbols value-forms env)
+(defun expand-arrow-setf-some-return (symbols value-forms env)
   (multiple-value-bind (vars vals stores store-fn access-fn)
       (get-setf-expansion (third (car (last value-forms))) env)
     (values (append (butlast symbols) vars)
@@ -65,7 +65,39 @@
             stores
             `(multiple-value-prog1 (values ,@stores)
                (when ,(car (last (butlast symbols))) ,store-fn))
-            access-fn)))
+            `(if ,(car (last (butlast symbols))) ,access-fn nil))))
+
+(defun cond-setf-expansions (value-forms env)
+  (loop for value-form in (cdr value-forms)
+        for place = (third value-form)
+        collect (multiple-value-list (get-setf-expansion place env))))
+
+(defun cond-generate-store-fn (store value-forms expansions)
+  (let ((conds (loop for value-form in (reverse (butlast value-forms))
+                     for test = (if (consp value-form)
+                                    (second value-form)
+                                    value-form)
+                     for (vars vals stores store-fn access-fn) in expansions
+                     for bindings = (append (mapcar #'list vars vals)
+                                            `((,(first stores) ,store)))
+                     collect `(,test (let* ,bindings ,store-fn)))))
+    `(prog1 ,store (cond ,@conds))))
+
+(defun cond-generate-access-fn (symbols expansions)
+  (let ((conds (loop for symbol in (reverse (butlast symbols))
+                     for (vars vals stores store-fn access-fn) in expansions
+                     for bindings = (mapcar #'list vars vals)
+                     collect `(,symbol (let ,bindings ,access-fn)))))
+    `(cond ,@conds)))
+
+(defun expand-arrow-setf-cond-return (symbols value-forms env)
+  (let ((expansions (cond-setf-expansions value-forms env))
+        (store (gensym "NEW")))
+    (values (butlast symbols)
+            (butlast value-forms)
+            (list store)
+            (cond-generate-store-fn store value-forms expansions)
+            (cond-generate-access-fn symbols expansions))))
 
 (defun expand-arrow-setf (forms env &key symbol-fn value-fn
                                       (return-fn #'expand-arrow-setf-return))
@@ -169,35 +201,35 @@
 
 (define-arrow some-> (&body forms)
   (expand forms :value-fn #'some-value-first
-                :return-fn #'expand-arrow-setf-if-return))
+                :return-fn #'expand-arrow-setf-some-return))
 
 (define-arrow some->> (&body forms)
   (expand forms :value-fn #'some-value-last
-                :return-fn #'expand-arrow-setf-if-return))
+                :return-fn #'expand-arrow-setf-some-return))
 
 (define-arrow some-<> (&body forms)
   (expand forms :value-fn #'some-diamond-value-first
-                :return-fn #'expand-arrow-setf-if-return))
+                :return-fn #'expand-arrow-setf-some-return))
 
 (define-arrow some-<>> (&body forms)
   (expand forms :value-fn #'some-diamond-value-last
-                :return-fn #'expand-arrow-setf-if-return))
+                :return-fn #'expand-arrow-setf-some-return))
 
 (define-arrow cond-> (&body forms)
   (expand forms :value-fn #'cond-value-first
-                :return-fn #'expand-arrow-setf-if-return))
+                :return-fn #'expand-arrow-setf-cond-return))
 
 (define-arrow cond->> (&body forms)
   (expand forms :value-fn #'cond-value-last
-                :return-fn #'expand-arrow-setf-if-return))
+                :return-fn #'expand-arrow-setf-cond-return))
 
 (define-arrow cond-<> (&body forms)
   (expand forms :value-fn #'cond-diamond-value-first
-                :return-fn #'expand-arrow-setf-if-return))
+                :return-fn #'expand-arrow-setf-cond-return))
 
 (define-arrow cond-<>> (&body forms)
   (expand forms :value-fn #'cond-diamond-value-last
-                :return-fn #'expand-arrow-setf-if-return))
+                :return-fn #'expand-arrow-setf-cond-return))
 
 (define-arrow ->* (&body forms)
   (let ((forms (append (last forms) (butlast forms))))

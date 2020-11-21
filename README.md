@@ -61,3 +61,4 @@ MIT.
 ## TODO
 
 * Add more examples
+* Thorough SETF tests to ensure that the expansions work correctly
