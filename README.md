@@ -57,9 +57,3 @@ All of the aforementioned threading macros name valid places for use in `setf`.
 ## License
 
 MIT.
-
-## TODO
-
-* Add more examples
-* Fix package name in examples
-* Thorough SETF tests to ensure that the expansions work correctly

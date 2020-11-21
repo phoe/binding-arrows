@@ -5,8 +5,8 @@ See [the test suite](../t/test.lisp) for even more examples.
 ## Arrow macros
 
 ```lisp
-ARROWS> (-> 3
-          /)
+BINDING-ARROWS> (-> 3
+                  /)
 
 ;; (let ((x 3)) (/ x))
 
@@ -14,8 +14,8 @@ ARROWS> (-> 3
 ```
 
 ```lisp
-ARROWS> (-> 3
-          (expt 2))
+BINDING-ARROWS> (-> 3
+                  (expt 2))
 
 ;; (let ((x 3)) (expt x 2))
 
@@ -23,8 +23,8 @@ ARROWS> (-> 3
 ```
 
 ```lisp
-ARROWS> (->> 3
-          (expt 2))
+BINDING-ARROWS> (->> 3
+                  (expt 2))
 
 ;; (let ((x 3)) (expt 2 x))
 
@@ -34,8 +34,8 @@ ARROWS> (->> 3
 ## Diamond arrow macros
 
 ```lisp
-ARROWS> (-<> 3
-          (/ 2))
+BINDING-ARROWS> (-<> 3
+                  (/ 2))
 
 ;; (let ((x 3)) (/ 3 2))
 
@@ -43,8 +43,8 @@ ARROWS> (-<> 3
 ```
 
 ```lisp
-ARROWS> (-<> 3
-          (/ <> 2))
+BINDING-ARROWS> (-<> 3
+                  (/ <> 2))
 
 ;; (let ((x 3)) (/ 3 2))
 
@@ -52,8 +52,8 @@ ARROWS> (-<> 3
 ```
 
 ```lisp
-ARROWS> (-<> 3
-          (/ 2 <>))
+BINDING-ARROWS> (-<> 3
+                  (/ 2 <>))
 
 ;; (let ((x 3)) (/ 2 3))
 
@@ -61,10 +61,10 @@ ARROWS> (-<> 3
 ```
 
 ```lisp
-ARROWS> (-<>> (list 1 2 3)
-          (remove-if #'oddp <> :count 1 :from-end t) ; substitute <>
-          (reduce #'+)                               ; insert last
-          /)                                         ; list designator
+BINDING-ARROWS> (-<>> (list 1 2 3)
+                  (remove-if #'oddp <> :count 1 :from-end t) ; substitute <>
+                  (reduce #'+)                               ; insert last
+                  /)                                         ; list designator
 
 ;; (let ((x (list 1 2 3)
 ;;       (y (remove-if #'oddp x :count 1 :from-end t))
@@ -75,9 +75,9 @@ ARROWS> (-<>> (list 1 2 3)
 ```
 
 ```lisp
-ARROWS> (let ((x 3))
-          (-<> (incf x)  ; (let ((r (incf x)))
-            (+ <> <>)))  ;   (+ r r))
+BINDING-ARROWS> (let ((x 3))
+                  (-<> (incf x)  ; (let ((r (incf x)))
+                    (+ <> <>)))  ;   (+ r r))
 
 ;; (let* ((x 3))
 ;;        (y (incf x))
