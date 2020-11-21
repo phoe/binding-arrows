@@ -7,6 +7,30 @@
 
 (in-package #:binding-arrows)
 
+(defvar *valid-cl-place-forms* ;; List from CLHS 5.1.2.2
+  '(aref    cdadr                    get
+    bit     cdar                     gethash
+    caaaar  cddaar                   logical-pathname-translations
+    caaadr  cddadr                   macro-function
+    caaar   cddar                    ninth
+    caadar  cdddar                   nth
+    caaddr  cddddr                   readtable-case
+    caadr   cdddr                    rest
+    caar    cddr                     row-major-aref
+    cadaar  cdr                      sbit
+    cadadr  char                     schar
+    cadar   class-name               second
+    caddar  compiler-macro-function  seventh
+    cadddr  documentation            sixth
+    caddr   eighth                   slot-value
+    cadr    elt                      subseq
+    car     fdefinition              svref
+    cdaaar  fifth                    symbol-function
+    cdaadr  fill-pointer             symbol-plist
+    cdaar   find-class               symbol-value
+    cdadar  first                    tenth
+    cdaddr  fourth                   third))
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Main arrow expansion function
 
@@ -74,17 +98,34 @@
                         (third value-form))
         collect (multiple-value-list (get-setf-expansion place env))))
 
-(defun cond-generate-store-fn (store value-forms expansions)
+(defun invalid-place-p (form first-value-p)
+  (flet ((invalid-cons-p (form)
+           (let ((thing (first (if first-value-p
+                                   form
+                                   (ensure-cons (third (third form)))))))
+             (and (symbolp thing)
+                  (eq (symbol-package thing) (find-package :cl))
+                  (not (member thing *valid-cl-place-forms*))))))
+    (typecase form
+      (cons (invalid-cons-p form))
+      (symbol nil)
+      (t t))))
+
+(defun cond-generate-store-fn (store symbols value-forms expansions)
   (let ((conds (loop for value-form in value-forms
-                     for test = (if (eq value-form (first value-forms))
+                     for first-value-p = (eq value-form (first value-forms))
+                     for test = (if first-value-p
                                     value-form
                                     (second value-form))
                      for (vars vals stores store-fn access-fn) in expansions
                      for bindings = (append (mapcar #'list vars vals)
                                             `((,(first stores) ,store)))
-                     collect `(,test (let* ,bindings ,store-fn)) into result
+                     unless (invalid-place-p value-form first-value-p)
+                       collect `(,test (let* ,bindings ,store-fn)) into result
                      finally (return (nreverse result)))))
-    `(multiple-value-prog1 ,store (cond ,@conds))))
+    `(multiple-value-prog1 ,store
+       ,@(butlast symbols)
+       (cond ,@conds))))
 
 (defun cond-generate-access-fn (symbols expansions)
   (let ((conds (loop for symbol in symbols
@@ -100,7 +141,7 @@
     (values (butlast symbols)
             (butlast value-forms)
             (list store)
-            (cond-generate-store-fn store value-forms expansions)
+            (cond-generate-store-fn store symbols value-forms expansions)
             (cond-generate-access-fn symbols expansions))))
 
 (defun expand-arrow-setf (forms env &key symbol-fn value-fn

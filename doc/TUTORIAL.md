@@ -402,4 +402,4 @@ For instance, this call is capable of setting four different places in total dep
       42)
 ```
 
-If a `cond` macro is used in `setf`, all of the resulting threaded forms should be valid places. Otherwise, compile-time warnings may occur if non-places are present in the thread of a `cond` threading macro that is passed to `setf`.
+If a `cond` macro is used in `setf`, the macroexpansion attempts to detect which of the threaded forms denote valid places and therefore generates setters only for them. The heuristic is imperfect and filters out literals and symbols from the CL package that cannot be used as places.
