@@ -379,7 +379,15 @@ And therefore to the following:
 
 ## Short-cirtuiting threading macros as places
 
-The `some` family of macros interacts differently with `setf` as a part of its short-circuiting. If the short-circuit is engaged anywhere in the thread, then the setting is not executed. Regardless of whether the setting occurs, `setf` form still returns the new value in order to preserve language semantics.
+The `some` family of macros interacts differently with `setf` as a part of its short-circuiting. If the short-circuit is engaged anywhere in the thread, then the setting is not executed. For example, the following code will only set the `car` of `cons` if it is not null:
+
+```lisp
+(setf (some-> cons
+        car)
+      42)
+```
+
+Regardless of whether the setting occurs, the `setf` form still returns the new value in order to preserve language semantics.
 
 ## Conditional threading macros as places
 
