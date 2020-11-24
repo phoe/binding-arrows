@@ -377,7 +377,7 @@ And therefore to the following:
 (rplaca (cdr (cdr (nthcdr 0 list))) 42)
 ```
 
-## Short-cirtuiting threading macros as places
+## Short-circuiting threading macros as places
 
 The `some` family of macros interacts differently with `setf` as a part of its short-circuiting. If the short-circuit is engaged anywhere in the thread, then the setting is not executed. For example, the following code will only set the `car` of `cons` if it is not null:
 
