@@ -81,7 +81,7 @@ Is equivalent to:
 
 Binds anonymous variables and threads them into subsequent forms:
   * by substituting diamond symbols (<>) if they are present in the form,
-  * as their last arguments (like the -> macro) otherwise.
+  * as their last arguments (like the ->> macro) otherwise.
 
 The diamond symbols are tested by name, not by identity, like LOOP keywords.
 
