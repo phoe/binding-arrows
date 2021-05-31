@@ -16,7 +16,7 @@ This has three main implications:
 
 * Binding threading macros expand into a `let*` form.
   * Binding threading macros are nicer to read when macroexpanded.
-  * Binding threading macros preserve for the debugger.
+  * Binding threading macros preserve intermediate binding steps for the debugger.
   * `setf` expansions are handled by explicit `setf` expanders for each macro.
 * Binding threading macros assume that it is possible to evaluate each form resulting from threading each computation step.
   * This also means that e.g. `(-> foo (defun (bar) (1+ bar)))` is going to expand into a correct `defun` form on a traditional threading macro implementation, but will fail on a binding implementation (e.g. this one).
