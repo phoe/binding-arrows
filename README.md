@@ -26,7 +26,7 @@ This has three main implications:
 
 ## Contents
 
-This system contains a package `binding-macros` that exports the following symbols:
+This system contains a package `binding-arrows` that exports the following symbols:
 
 * threading macros `->` and `->>`,
 * diamond threading macros `-<>` and `-<>>`,
