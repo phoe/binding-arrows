@@ -74,7 +74,7 @@
 
 (defun expand-arrow-setf-return (symbols value-forms env)
   (multiple-value-bind (vars vals stores store-fn access-fn)
-      (get-setf-expansion (car (last value-forms)) env)
+      (safe-get-setf-expansion (car (last value-forms)) env)
     (values (append (butlast symbols) vars)
             (append (butlast value-forms) vals)
             stores
@@ -83,7 +83,7 @@
 
 (defun expand-arrow-setf-some-return (symbols value-forms env)
   (multiple-value-bind (vars vals stores store-fn access-fn)
-      (get-setf-expansion (third (car (last value-forms))) env)
+      (safe-get-setf-expansion (third (car (last value-forms))) env)
     (values (append (butlast symbols) vars)
             (append (butlast value-forms) vals)
             stores
@@ -96,7 +96,7 @@
         for place = (if (eq value-form (first value-forms))
                         value-form
                         (third value-form))
-        collect (multiple-value-list (get-setf-expansion place env))))
+        collect (multiple-value-list (safe-get-setf-expansion place env))))
 
 (defun invalid-place-p (form first-value-p)
   (flet ((invalid-cons-p (form)
@@ -110,6 +110,11 @@
       (cons (invalid-cons-p form))
       (symbol nil)
       (t t))))
+
+(defun safe-get-setf-expansion (form &optional env)
+  (if (invalid-place-p form env)
+      (values nil nil nil (constantly nil) (constantly nil))
+      (get-setf-expansion form env)))
 
 (defun cond-generate-store-fn (store symbols value-forms expansions)
   (let ((conds (loop for value-form in value-forms
@@ -148,7 +153,7 @@
                                       (return-fn #'expand-arrow-setf-return))
   (case (length forms)
     (0 (error "Cannot get the SETF expansion of an empty threading macro."))
-    (1 (get-setf-expansion (first forms)))
+    (1 (safe-get-setf-expansion (first forms)))
     (t (expand-aux forms symbol-fn value-fn return-fn env))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
